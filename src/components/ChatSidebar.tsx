@@ -5,7 +5,7 @@ const Suggestions: React.FC<{ onSelect: (text: string) => void }> = ({ onSelect 
     const items = [
         { icon: "🧭", text: "Where haven't I been yet?", prompt: "Show me where I haven't been yet" },
         { icon: "✨", text: "Guess the country", prompt: "Give me a riddle for a country to guess" },
-        { icon: "📍", text: "Plan a journey for us to go on", prompt: "Help me plan a journey to places I haven't been" },
+        { icon: "📍", text: "Plan a journey for us to go on", prompt: "Help me plan a journey to places I haven't been. Show me the available themes." },
     ];
 
     return (
