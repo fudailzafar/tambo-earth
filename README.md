@@ -2,6 +2,9 @@
 
 **Tambo Earth** is an interactive, AI-powered 3D globe application that allows users to explore the world through natural language conversations. It combines the visual immersion of 3D globe with the intelligence of a generative AI assistant, creating a seamless educational and exploratory experience.
 
+![Tambo Earth Demo]
+(https://github.com/fudailzafar/chat-earth/blob/main/public/demo.gif)
+
 ## ✨ About the Project
 
 The goal of Tambo Earth is to reimagine how we interact with geographical data. Instead of static maps or search bars, users can ask questions like *"Show me a culinary tour of Italy"* or *"Where should I go for a tropical vacation?"*. The AI not only answers but controls the globe to fly you there, displaying rich, interactive content.
