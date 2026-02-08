@@ -10,6 +10,7 @@ import { MobileWarning } from "./components/MobileWarning";
 
 import { JourneyPicker, JourneyPickerSchema } from "./components/JourneyPicker";
 import { JourneyList, JourneyListSchema } from "./components/JourneyList";
+import { FunFact, FunFactSchema } from "./components/FunFact";
 
 const components = [
   {
@@ -29,6 +30,12 @@ const components = [
     description: "Display a planned journey with a list of destinations and details. Use this whenever suggesting a list of countries to visit for a theme.",
     component: JourneyList,
     propsSchema: JourneyListSchema,
+  },
+  {
+    name: "FunFact",
+    description: "Display a fun or interesting fact about a location. Use this whenever asked to tell a fun fact or interesting trivia.",
+    component: FunFact,
+    propsSchema: FunFactSchema,
   }
 ];
 
@@ -39,7 +46,7 @@ const AppContent = () => {
   const handleCountrySelect = (countryName: string) => {
     console.log("Country selected:", countryName);
     if (sendThreadMessage) {
-      sendThreadMessage(`Tell me about ${countryName}. Use the LocationCard to show its flag and details. Also tell me a fun fact about it.`);
+      sendThreadMessage(`Tell me about ${countryName}. Use the LocationCard to show its flag and details. Also use the FunFact tool to show a fun fact or interesting trivia about it.`);
     } else {
       console.error("sendThreadMessage is not available");
     }

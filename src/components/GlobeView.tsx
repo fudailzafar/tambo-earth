@@ -38,6 +38,7 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
     useEffect(() => {
         if (globeEl.current) {
             setViewer(globeEl.current);
+            globeEl.current.pointOfView({ altitude: 2.0 });
 
             // Auto-rotate setup
             const controls = globeEl.current.controls();
