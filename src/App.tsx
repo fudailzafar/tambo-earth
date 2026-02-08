@@ -77,7 +77,7 @@ const AppContent = () => {
                   GitHub
                 </a>
                 <a
-                  href="https://youtube.com"
+                  href="https://youtu.be/cwZmLdoYegc"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
