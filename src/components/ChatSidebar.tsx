@@ -106,19 +106,7 @@ export const ChatSidebar: React.FC = () => {
                                 ? message.content.some(p => p.type === 'text' && p.text?.trim())
                                 : String(message.content)?.trim();
 
-                            if (!hasContent && !message.renderedComponent) {
-                                // Debug: Show placeholder for empty assistant messages
-                                if (message.role === 'assistant') {
-                                    return (
-                                        <div key={message.id} className="flex flex-col gap-1 items-start">
-                                            <div className="py-3 px-4 rounded-2xl bg-yellow-100 text-yellow-800 text-xs border border-yellow-300">
-                                                [Empty Assistant Message - Pending Component?]
-                                            </div>
-                                        </div>
-                                    );
-                                }
-                                return null;
-                            }
+                            if (!hasContent && !message.renderedComponent) return null;
 
                             return (
                                 <div key={message.id} className={`flex flex-col gap-1 ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
