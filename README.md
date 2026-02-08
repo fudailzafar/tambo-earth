@@ -1,10 +1,10 @@
-# 🌍 Chat Earth
+# 🌍 Tambo Earth
 
-**Chat Earth** is an interactive, AI-powered 3D globe application that allows users to explore the world through natural language conversations. It combines the visual immersion of a 3D globe with the intelligence of a generative AI assistant, creating a seamless educational and exploratory experience.
+**Tambo Earth** is an interactive, AI-powered 3D globe application that allows users to explore the world through natural language conversations. It combines the visual immersion of 3D globe with the intelligence of a generative AI assistant, creating a seamless educational and exploratory experience.
 
 ## ✨ About the Project
 
-The goal of Chat Earth is to reimagine how we interact with geographical data. Instead of static maps or search bars, users can ask questions like *"Show me a culinary tour of Italy"* or *"Where should I go for a tropical vacation?"*. The AI not only answers but controls the globe to fly you there, displaying rich, interactive content.
+The goal of Tambo Earth is to reimagine how we interact with geographical data. Instead of static maps or search bars, users can ask questions like *"Show me a culinary tour of Italy"* or *"Where should I go for a tropical vacation?"*. The AI not only answers but controls the globe to fly you there, displaying rich, interactive content.
 
 ### Key Features
 
@@ -47,8 +47,8 @@ The application is built around a centralized context and event-driven architect
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/your-username/chat-earth.git
-    cd chat-earth
+    git clone https://github.com/your-username/tambo-earth.git
+    cd tambo-earth
     ```
 
 2.  **Install dependencies**:
@@ -59,10 +59,9 @@ The application is built around a centralized context and event-driven architect
     ```
 
 3.  **Set up Environment**:
-    Create a `.env` file and add your Tambo AI logic and token:
+    Create a `.env` file and add your Tambo API key:
     ```env
-    VITE_TAMBO_LOGIC_ID=your_logic_id
-    VITE_TAMBO_TOKEN=your_token
+    VITE_TAMBO_API_KEY=your_token
     ```
 
 4.  **Run Development Server**:
@@ -72,13 +71,7 @@ The application is built around a centralized context and event-driven architect
 
 ## 📈 Learning & Growth
 
-Developing Chat Earth presented several unique challenges:
+Developing Tambo Earth presented several unique challenges:
 *   **Streaming Stability**: Handling streaming AI responses with complex tool calls required robust schema definitions using `zod`. We moved from loose `z.any()` types to strict `z.string().nullish()` to ensure reliability.
 *   **3D-2D Sync**: Synchronizing React state (2D UI) with the imperative Three.js camera (3D Globe) required careful use of `refs` and `useEffect` hooks to bridge the gap.
 *   **UX Refinement**: We iterated significantly on the "Visit" flow, moving from simple clicks to a sophisticated "Select -> Visit -> Persist Label" model that feels natural and keeps the view uncluttered.
-
-## 🔮 Future Roadmap
-
-*   **User Accounts**: Persist `visitedCountries` to a database.
-*   **Richer Data**: Integrate real-time weather or flight data.
-*   **VR Support**: Explore WebXR for an immersive VR experience.
