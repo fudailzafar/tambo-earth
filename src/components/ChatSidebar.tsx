@@ -1,11 +1,11 @@
-import React, { useRef, useEffect } from "react";
-import { useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
+import React, { useRef, useEffect, useState } from "react";
+import { useTamboThread } from "@tambo-ai/react";
 
 const Suggestions: React.FC<{ onSelect: (text: string) => void }> = ({ onSelect }) => {
     const items = [
-        { icon: "🧭", text: "Where haven't I been yet?" },
-        { icon: "✨", text: "Guess the country" },
-        { icon: "📍", text: "Plan a journey for us to go on" },
+        { icon: "🧭", text: "Where haven't I been yet?", prompt: "Show me where I haven't been yet" },
+        { icon: "✨", text: "Guess the country", prompt: "Give me a riddle for a country to guess" },
+        { icon: "📍", text: "Plan a journey for us to go on", prompt: "Help me plan a journey to places I haven't been" },
     ];
 
     return (
@@ -14,7 +14,7 @@ const Suggestions: React.FC<{ onSelect: (text: string) => void }> = ({ onSelect 
             {items.map((item, index) => (
                 <button
                     key={index}
-                    onClick={() => onSelect(item.text)}
+                    onClick={() => onSelect(item.prompt)}
                     className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 text-left transition-colors group"
                 >
                     <span className="text-gray-500 group-hover:text-black transition-colors">{item.icon}</span>
@@ -26,15 +26,43 @@ const Suggestions: React.FC<{ onSelect: (text: string) => void }> = ({ onSelect 
 };
 
 export const ChatSidebar: React.FC = () => {
-    const { thread } = useTamboThread();
-    const { value, setValue, submit, isPending } = useTamboThreadInput();
+    const { thread, sendThreadMessage, isIdle } = useTamboThread();
+    const [value, setValue] = useState("");
+    const [isSending, setIsSending] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    // Combine local sending state with isIdle
+    // If not idle, we are generating or streaming
+    const isPending = isSending || !isIdle;
+
+    // Reset sending state when we are no longer idle (generation started)
+    // or if we hit an error state (which might also be idle but streaming is false)
+    useEffect(() => {
+        if (!isIdle) {
+            setIsSending(false);
+        }
+    }, [isIdle]);
 
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [thread.messages]);
+    }, [thread?.messages, isSending]);
+
+    const submit = async (text?: string) => {
+        const messageToSend = text || value;
+        if (!messageToSend.trim()) return;
+
+        setIsSending(true);
+        setValue(""); // Clear input immediately
+
+        try {
+            await sendThreadMessage(messageToSend);
+        } catch (error) {
+            console.error("Failed to send message:", error);
+            setIsSending(false);
+        }
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -43,41 +71,89 @@ export const ChatSidebar: React.FC = () => {
         }
     };
 
+    console.log("ChatSidebar rendered. Messages:", thread?.messages?.length);
+
+    // Debug filtering
+    (thread?.messages || []).forEach((m, i) => {
+        const hasContent = Array.isArray(m.content) ? m.content.length > 0 : !!m.content;
+        const hasComponent = !!m.renderedComponent;
+        console.log(`Msg ${i} [${m.role}]: content=${m.content}, component=${hasComponent}`, m);
+    });
+
+    // Filter out tool messages and messages with no visible content
+    const MESSAGES = (thread?.messages || []).filter(m =>
+        m.role !== 'tool' &&
+        (
+            (Array.isArray(m.content) ? m.content.length > 0 : !!m.content) ||
+            !!m.renderedComponent
+        )
+    );
+
     return (
         <div className="flex flex-col h-full bg-white p-6">
             <div className="flex-1 overflow-y-auto" ref={scrollRef}>
-                {thread.messages.length === 0 ? (
+                {MESSAGES.length === 0 ? (
                     <div className="h-full flex flex-col justify-end">
                         <Suggestions onSelect={(text) => {
-                            setValue(text);
-                            // setTimeout(() => submit(), 0); // Optional: auto-submit
+                            submit(text);
                         }} />
                     </div>
                 ) : (
                     <div className="flex flex-col gap-4 py-4">
-                        {thread.messages.map((message) => (
-                            <div key={message.id} className={`flex flex-col gap-1 ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                <div
-                                    className={`py-3 px-4 rounded-2xl max-w-[90%] text-sm leading-relaxed ${message.role === 'user'
-                                        ? 'bg-black text-white rounded-br-none'
-                                        : 'bg-gray-100 text-gray-800 rounded-bl-none'
-                                        }`}
-                                >
-                                    {Array.isArray(message.content) ? (
-                                        message.content.map((part, i) =>
-                                            part.type === "text" ? <p key={i}>{part.text}</p> : null
-                                        )
-                                    ) : (
-                                        <p>{String(message.content)}</p>
+                        {MESSAGES.map((message) => {
+                            // Helper to check if content is truly empty
+                            const hasContent = Array.isArray(message.content)
+                                ? message.content.some(p => p.type === 'text' && p.text?.trim())
+                                : String(message.content)?.trim();
+
+                            if (!hasContent && !message.renderedComponent) {
+                                // Debug: Show placeholder for empty assistant messages
+                                if (message.role === 'assistant') {
+                                    return (
+                                        <div key={message.id} className="flex flex-col gap-1 items-start">
+                                            <div className="py-3 px-4 rounded-2xl bg-yellow-100 text-yellow-800 text-xs border border-yellow-300">
+                                                [Empty Assistant Message - Pending Component?]
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            }
+
+                            return (
+                                <div key={message.id} className={`flex flex-col gap-1 ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                    {hasContent && (
+                                        <div
+                                            className={`py-3 px-4 rounded-2xl max-w-[90%] text-sm leading-relaxed ${message.role === 'user'
+                                                ? 'bg-black text-white rounded-br-none'
+                                                : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                                                }`}
+                                        >
+                                            {Array.isArray(message.content) ? (
+                                                message.content.map((part, i) =>
+                                                    part.type === "text" ? <p key={i}>{part.text}</p> : null
+                                                )
+                                            ) : (
+                                                <p>{String(message.content)}</p>
+                                            )}
+                                        </div>
+                                    )}
+                                    {message.renderedComponent && (
+                                        <div className="mt-2 w-full">
+                                            {message.renderedComponent}
+                                        </div>
                                     )}
                                 </div>
-                                {message.renderedComponent && (
-                                    <div className="mt-2 w-full">
-                                        {message.renderedComponent}
-                                    </div>
-                                )}
+                            );
+                        })}
+                        {/* Loading indicator */}
+                        {(isPending || !isIdle) && (
+                            <div className="flex gap-1 items-center bg-gray-100 p-3 rounded-2xl rounded-tl-none w-fit">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                             </div>
-                        ))}
+                        )}
                     </div>
                 )}
             </div>

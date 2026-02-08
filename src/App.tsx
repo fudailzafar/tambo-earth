@@ -1,10 +1,12 @@
-import { TamboProvider } from "@tambo-ai/react";
+import { TamboProvider, useTamboThread } from "@tambo-ai/react";
 import { Layout, MainContent, Sidebar } from "./components/Layout";
 import { GlobeView } from "./components/GlobeView";
 import { ChatSidebar } from "./components/ChatSidebar";
 import { PathfinderStatus } from "./components/PathfinderStatus";
 import { globeTools } from "./tools/globeTools";
+import { PathfinderProvider } from "./context/CountryContext";
 import { LocationCard, LocationCardSchema } from "./components/LocationCard";
+import { MobileWarning } from "./components/MobileWarning";
 
 const components = [
   {
@@ -14,6 +16,44 @@ const components = [
     propsSchema: LocationCardSchema,
   }
 ];
+
+const AppContent = () => {
+  const { sendThreadMessage } = useTamboThread();
+  console.log("AppContent rendered. sendThreadMessage available:", !!sendThreadMessage);
+
+  const handleCountrySelect = (countryName: string) => {
+    console.log("Country selected:", countryName);
+    if (sendThreadMessage) {
+      sendThreadMessage(`Tell me about ${countryName}. Use the LocationCard to show its flag and details. Also tell me a fun fact about it.`);
+    } else {
+      console.error("sendThreadMessage is not available");
+    }
+  };
+
+  return (
+    <PathfinderProvider>
+      <MobileWarning />
+      <div className="hidden md:block h-full w-full">
+        <Layout>
+          <MainContent>
+            <GlobeView onCountrySelect={handleCountrySelect} />
+            <PathfinderStatus />
+
+            {/* Back arrow placeholder to match design */}
+            <div className="absolute top-6 left-6 z-10 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+              <img src="/octo-white-background-rounded.png" alt="Logo" className="w-6 h-6" />
+              <span className="font-semibold text-gray-200">TamboEarth</span>
+            </div>
+
+          </MainContent>
+          <Sidebar>
+            <ChatSidebar />
+          </Sidebar>
+        </Layout>
+      </div>
+    </PathfinderProvider>
+  );
+};
 
 function App() {
   const apiKey = import.meta.env.VITE_TAMBO_API_KEY;
@@ -35,25 +75,7 @@ function App() {
       components={components}
       tools={globeTools}
     >
-      <Layout>
-        <MainContent>
-          <GlobeView />
-          <PathfinderStatus />
-
-          {/* Back arrow placeholder to match design */}
-          <div className="absolute top-6 left-6 z-10 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800">
-              <path d="M19 12H5" />
-              <path d="m12 19-7-7 7-7" />
-            </svg>
-            <span className="font-semibold text-gray-800">chatkit.world</span>
-          </div>
-
-        </MainContent>
-        <Sidebar>
-          <ChatSidebar />
-        </Sidebar>
-      </Layout>
+      <AppContent />
     </TamboProvider>
   );
 }

@@ -1,11 +1,11 @@
-import { Viewer } from "cesium";
+import type { GlobeMethods } from "react-globe.gl";
 
-let viewerInstance: Viewer | null = null;
+let globeViewer: GlobeMethods | null = null;
 
-export const setViewer = (viewer: Viewer) => {
-    viewerInstance = viewer;
+export const setViewer = (viewer: GlobeMethods) => {
+    globeViewer = viewer;
 };
 
 export const getViewer = () => {
-    return viewerInstance;
+    return globeViewer;
 };

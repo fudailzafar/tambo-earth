@@ -6,7 +6,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="flex h-screen w-screen bg-[#E0F2FE] overflow-hidden font-sans">
+    <div className="relative h-screen w-screen bg-black overflow-hidden font-sans">
       {children}
     </div>
   );
@@ -14,7 +14,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
 export const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="w-[300px] md:w-[400px] lg:w-[450px] xl:w-[500px] h-full bg-white flex flex-col shadow-xl z-10 shrink-0">
+    <div className="absolute top-4 right-4 bottom-4 w-[380px] bg-white rounded-3xl shadow-2xl z-20 flex flex-col overflow-hidden border border-white/50 backdrop-blur-sm">
       {children}
     </div>
   );
@@ -22,7 +22,7 @@ export const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 export const MainContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="flex-1 relative h-full">
+    <div className="absolute top-0 bottom-0 left-0 right-[400px] z-0">
       {children}
     </div>
   );

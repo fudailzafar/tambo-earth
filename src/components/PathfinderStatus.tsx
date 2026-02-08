@@ -1,48 +1,75 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { usePathfinder } from '../context/CountryContext';
+import { JourneyModal } from './JourneyModal';
 
 export const PathfinderStatus: React.FC = () => {
+    const { visitedCountries, getLevelInfo } = usePathfinder();
+    const [showModal, setShowModal] = useState(false);
+
+    const count = visitedCountries.length;
+    const TOTAL_COUNTRIES = 195;
+    const percentage = Math.round((count / TOTAL_COUNTRIES) * 100);
+    const { name: levelName } = getLevelInfo();
+
+    // Circular progress calculation
+    const radius = 18;
+    const circumference = 2 * Math.PI * radius;
+    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+    // Simple level number mapping
+    const levelNumber = levelName === "Wanderer" ? 0 :
+        levelName === "Pathfinder" ? 1 :
+            levelName === "Explorer" ? 2 :
+                levelName === "Trailblazer" ? 3 :
+                    levelName === "Voyager" ? 4 :
+                        levelName === "Navigator" ? 5 : 6; // World Class
+
     return (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-lg p-2 pl-2 pr-4 flex items-center gap-4 min-w-[300px]">
-            {/* Level Indicator */}
-            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shrink-0">
-                2
+        <>
+            <div
+                onClick={() => setShowModal(true)}
+                className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 bg-white rounded-full shadow-2xl py-3 px-6 flex items-center gap-6 min-w-[340px] cursor-pointer hover:scale-105 transition-transform active:scale-95"
+            >
+                {/* Level Indicator */}
+                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-lg shrink-0 shadow-lg">
+                    {levelNumber}
+                </div>
+
+                {/* Text Info */}
+                <div className="flex flex-col flex-1 text-center">
+                    <span className="text-gray-800 font-medium text-xl tracking-tight leading-tight">{levelName}</span>
+                    <span className="text-gray-500 text-sm font-normal">{count} countries visited</span>
+                </div>
+
+                {/* Progress Circle */}
+                <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+                    <svg className="w-full h-full transform -rotate-90">
+                        <circle
+                            cx="20"
+                            cy="20"
+                            r="17"
+                            stroke="#e5e7eb"
+                            strokeWidth="2.5"
+                            fill="transparent"
+                        />
+                        <circle
+                            cx="20"
+                            cy="20"
+                            r="17"
+                            stroke="#4b5563"
+                            strokeWidth="2.5"
+                            fill="transparent"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={strokeDashoffset}
+                            className="transition-all duration-1000 ease-out"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                    <span className="absolute text-[11px] font-semibold text-gray-700">{percentage}%</span>
+                </div>
             </div>
 
-            {/* Text Info */}
-            <div className="flex flex-col flex-1 text-center">
-                <span className="text-gray-900 font-medium text-sm">Pathfinder</span>
-                <span className="text-gray-500 text-xs">5 countries visited</span>
-            </div>
-
-            {/* Progress Circle */}
-            <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
-                {/* Background circle */}
-                <svg className="w-full h-full transform -rotate-90">
-                    <circle
-                        cx="20"
-                        cy="20"
-                        r="18"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="transparent"
-                        className="text-gray-200"
-                    />
-                    {/* Progress circle */}
-                    <circle
-                        cx="20"
-                        cy="20"
-                        r="18"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="transparent"
-                        strokeDasharray={2 * Math.PI * 18}
-                        strokeDashoffset={2 * Math.PI * 18 * (1 - 0.03)}
-                        className="text-gray-800"
-                        strokeLinecap="round"
-                    />
-                </svg>
-                <span className="absolute text-[10px] font-medium text-gray-700">3%</span>
-            </div>
-        </div>
+            <JourneyModal isOpen={showModal} onClose={() => setShowModal(false)} />
+        </>
     );
 };

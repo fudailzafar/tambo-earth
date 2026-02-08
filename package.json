@@ -14,13 +14,12 @@
     "@tailwindcss/vite": "^4.1.18",
     "@tambo-ai/react": "^0.73.1",
     "autoprefixer": "^10.4.24",
-    "cesium": "^1.137.0",
+    "lucide-react": "^0.563.0",
     "postcss": "^8.5.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "resium": "^1.19.3",
+    "react-globe.gl": "^2.37.0",
     "tailwindcss": "^4.1.18",
-    "vite-plugin-cesium": "^1.2.23",
     "zod": "^4.3.6"
   },
   "devDependencies": {
