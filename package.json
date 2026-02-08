@@ -20,6 +20,8 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-globe.gl": "^2.37.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.1.18",
     "zod": "^3.25.76",
     "zod-to-json-schema": "^3.25.1"

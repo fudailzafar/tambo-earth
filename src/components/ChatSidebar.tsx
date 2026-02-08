@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useTamboThread } from "@tambo-ai/react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const Suggestions: React.FC<{ onSelect: (text: string) => void }> = ({ onSelect }) => {
     const items = [
@@ -111,6 +113,7 @@ export const ChatSidebar: React.FC = () => {
                             return (
                                 <div key={message.id} className={`flex flex-col gap-1 ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
                                     {hasContent && (
+
                                         <div
                                             className={`py-3 px-4 rounded-2xl max-w-[90%] text-sm leading-relaxed ${message.role === 'user'
                                                 ? 'bg-black text-white rounded-br-none'
@@ -119,10 +122,43 @@ export const ChatSidebar: React.FC = () => {
                                         >
                                             {Array.isArray(message.content) ? (
                                                 message.content.map((part, i) =>
-                                                    part.type === "text" ? <p key={i}>{part.text}</p> : null
+                                                    part.type === "text" ? (
+                                                        <ReactMarkdown
+                                                            key={i}
+                                                            remarkPlugins={[remarkGfm]}
+                                                            components={{
+                                                                ul: ({ node, ...props }: any) => <ul className="list-disc pl-4 my-2 space-y-1" {...props} />,
+                                                                ol: ({ node, ...props }: any) => <ol className="list-decimal pl-4 my-2 space-y-1" {...props} />,
+                                                                li: ({ node, ...props }: any) => <li className="my-0.5" {...props} />,
+                                                                p: ({ node, ...props }: any) => <p className="mb-2 last:mb-0 inline-block" {...props} />,
+                                                                a: ({ node, ...props }: any) => <a className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                                                                h1: ({ node, ...props }: any) => <h1 className="text-lg font-bold my-2" {...props} />,
+                                                                h2: ({ node, ...props }: any) => <h2 className="text-base font-bold my-2" {...props} />,
+                                                                h3: ({ node, ...props }: any) => <h3 className="text-sm font-bold my-1" {...props} />,
+                                                                strong: ({ node, ...props }: any) => <strong className="font-semibold" {...props} />,
+                                                            }}
+                                                        >
+                                                            {part.text}
+                                                        </ReactMarkdown>
+                                                    ) : null
                                                 )
                                             ) : (
-                                                <p>{String(message.content)}</p>
+                                                <ReactMarkdown
+                                                    remarkPlugins={[remarkGfm]}
+                                                    components={{
+                                                        ul: ({ node, ...props }: any) => <ul className="list-disc pl-4 my-2 space-y-1" {...props} />,
+                                                        ol: ({ node, ...props }: any) => <ol className="list-decimal pl-4 my-2 space-y-1" {...props} />,
+                                                        li: ({ node, ...props }: any) => <li className="my-0.5" {...props} />,
+                                                        p: ({ node, ...props }: any) => <p className="mb-2 last:mb-0 inline-block" {...props} />,
+                                                        a: ({ node, ...props }: any) => <a className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                                                        h1: ({ node, ...props }: any) => <h1 className="text-lg font-bold my-2" {...props} />,
+                                                        h2: ({ node, ...props }: any) => <h2 className="text-base font-bold my-2" {...props} />,
+                                                        h3: ({ node, ...props }: any) => <h3 className="text-sm font-bold my-1" {...props} />,
+                                                        strong: ({ node, ...props }: any) => <strong className="font-semibold" {...props} />,
+                                                    }}
+                                                >
+                                                    {String(message.content)}
+                                                </ReactMarkdown>
                                             )}
                                         </div>
                                     )}
