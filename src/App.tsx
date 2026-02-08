@@ -9,6 +9,7 @@ import { LocationCard, LocationCardSchema } from "./components/LocationCard";
 import { MobileWarning } from "./components/MobileWarning";
 
 import { JourneyPicker, JourneyPickerSchema } from "./components/JourneyPicker";
+import { JourneyList, JourneyListSchema } from "./components/JourneyList";
 
 const components = [
   {
@@ -22,6 +23,12 @@ const components = [
     description: "Display a menu of journey themes for the user to choose from when they want to plan a trip.",
     component: JourneyPicker,
     propsSchema: JourneyPickerSchema,
+  },
+  {
+    name: "JourneyList",
+    description: "Display a planned journey with a list of destinations and details. Use this whenever suggesting a list of countries to visit for a theme.",
+    component: JourneyList,
+    propsSchema: JourneyListSchema,
   }
 ];
 
