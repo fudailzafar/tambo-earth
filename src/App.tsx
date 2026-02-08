@@ -62,9 +62,29 @@ const AppContent = () => {
             <PathfinderStatus />
 
             {/* Back arrow placeholder to match design */}
-            <div className="absolute top-6 left-6 z-10 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-              <img src="/octo-white-background-rounded.png" alt="Logo" className="w-6 h-6" />
-              <span className="font-semibold text-gray-200">TamboEarth</span>
+            <div className="absolute top-6 left-6 z-10 flex items-center gap-6">
+              <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                <img src="/octo-white-background-rounded.png" alt="Logo" className="w-6 h-6" />
+                <span className="font-semibold text-gray-200">TamboEarth</span>
+              </div>
+              <div className="flex items-center gap-4 border-l border-white/10 pl-6">
+                <a
+                  href="https://github.com/fudailzafar/tambo-earth"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                >
+                  GitHub
+                </a>
+                <a
+                  href="https://youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                >
+                  YouTube
+                </a>
+              </div>
             </div>
 
           </MainContent>

@@ -27,7 +27,8 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
     const { isVisited, visitCountry, targetCountry } = usePathfinder();
     const [countries, setCountries] = useState({ features: [] });
     const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
-    const [selectedMarker, setSelectedMarker] = useState<{ lat: number, lng: number, code: string, name: string } | null>(null);
+    const [selectedMarker, setSelectedMarker] = useState<{ lat: number, lng: number, code: string, name: string, visited?: boolean } | null>(null);
+    const [focusedCountry, setFocusedCountry] = useState<string | null>(null);
 
     useEffect(() => {
         // Load country data
@@ -45,8 +46,7 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
             });
 
             if (country) {
-                // Determine centroid and fly
-                handlePolygonClick(country as CountryFeature);
+                flyToRegion(country as CountryFeature);
             }
         }
     }, [targetCountry, countries]);
@@ -82,14 +82,9 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
         return 'rgba(255, 255, 255, 0)'; // Transparent
     };
 
-    const handlePolygonClick = (d: CountryFeature) => {
-        // Stop rotation immediately
-        if (globeEl.current) {
-            globeEl.current.controls().autoRotate = false;
-        }
-
+    const flyToRegion = (d: CountryFeature) => {
         const name = d.properties.ADMIN || d.properties.NAME || d.properties.name;
-        const code = d.properties.ISO_A2 || d.properties.ISO_A3 || "UN"; // Fallback
+        const code = d.properties.ISO_A2 || d.properties.ISO_A3 || "UN";
 
         if (!name) return;
 
@@ -101,20 +96,35 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
             lng /= coords.length;
             lat /= coords.length;
         } else if (d.geometry && d.geometry.type === 'MultiPolygon') {
-            // Provide safe fallback for MultiPolygon: use the first polygon's centroid
             const coords = d.geometry.coordinates[0][0];
             coords.forEach((c: any) => { lng += c[0]; lat += c[1]; });
             lng /= coords.length;
             lat /= coords.length;
         }
 
-        console.log("Clicked (Selected):", name, code);
-        // Do NOT visit yet. Just select and zoom to intermediate level.
-        setSelectedMarker({ lat: lat, lng: lng, code: String(code), name: String(name) });
+        setFocusedCountry(String(name));
+        setSelectedMarker({ lat: lat, lng: lng, code: String(code), name: String(name), visited: false });
 
         if (globeEl.current) {
-            // Intermediate zoom for selection
+            globeEl.current.controls().autoRotate = false;
             globeEl.current.pointOfView({ lat, lng, altitude: 1.5 }, 1000);
+        }
+    };
+
+    const handlePolygonClick = (d: CountryFeature) => {
+        const name = d.properties.ADMIN || d.properties.NAME || d.properties.name;
+        if (!name) return;
+
+        if (focusedCountry === name) {
+            // Deselect / Zoom Out
+            setFocusedCountry(null);
+            setSelectedMarker(null);
+            if (globeEl.current) {
+                globeEl.current.pointOfView({ altitude: 2.0 }, 1000);
+            }
+        } else {
+            // Select / Zoom In
+            flyToRegion(d);
         }
     };
 
@@ -164,6 +174,27 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
                     label.style.marginBottom = '8px';
                     label.style.border = '1px solid rgba(255,255,255,0.1)';
                     label.style.backdropFilter = 'blur(4px)';
+                    label.style.cursor = 'pointer'; // Make label clickable
+                    label.style.transition = 'transform 0.1s, background 0.2s';
+
+                    label.onmouseenter = () => {
+                        label.style.transform = 'scale(1.05)';
+                        label.style.background = 'rgba(40, 40, 40, 0.95)';
+                    };
+                    label.onmouseleave = () => {
+                        label.style.transform = 'scale(1.0)';
+                        label.style.background = 'rgba(20, 20, 20, 0.9)';
+                    };
+
+                    // Label Click -> Zoom Out
+                    label.onclick = (e) => {
+                        e.stopPropagation();
+                        setFocusedCountry(null);
+                        setSelectedMarker(null);
+                        if (globeEl.current) {
+                            globeEl.current.pointOfView({ altitude: 2.0 }, 1000);
+                        }
+                    };
 
                     label.innerHTML = `
                         <img src="https://flagcdn.com/w40/${d.code.toLowerCase()}.png" style="width: 20px; height: 15px; object-fit: cover; border-radius: 2px;" />
@@ -171,42 +202,46 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
                     `;
                     el.appendChild(label);
 
-                    // Visit Button
-                    const btn = document.createElement('button');
-                    btn.textContent = "Visit";
-                    btn.style.padding = '8px 20px';
-                    btn.style.background = 'white';
-                    btn.style.color = 'black';
-                    btn.style.borderRadius = '20px';
-                    btn.style.border = 'none';
-                    btn.style.fontWeight = '600';
-                    btn.style.fontSize = '14px';
-                    btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-                    btn.style.cursor = 'pointer';
-                    btn.style.transition = 'transform 0.1s';
+                    // Visit Button - Only show if NOT visited yet
+                    if (!d.visited) {
+                        const btn = document.createElement('button');
+                        btn.textContent = "Visit";
+                        btn.style.padding = '8px 20px';
+                        btn.style.background = 'white';
+                        btn.style.color = 'black';
+                        btn.style.borderRadius = '20px';
+                        btn.style.border = 'none';
+                        btn.style.fontWeight = '600';
+                        btn.style.fontSize = '14px';
+                        btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+                        btn.style.cursor = 'pointer';
+                        btn.style.transition = 'transform 0.1s';
 
-                    // Simple hover effect
-                    btn.onmouseenter = () => btn.style.transform = 'scale(1.05)';
-                    btn.onmouseleave = () => btn.style.transform = 'scale(1.0)';
+                        btn.onmouseenter = () => btn.style.transform = 'scale(1.05)';
+                        btn.onmouseleave = () => btn.style.transform = 'scale(1.0)';
 
-                    // Click handler for Visit
-                    btn.onclick = (e) => {
-                        e.stopPropagation();
-                        // Zoom in closer
-                        if (globeEl.current) {
-                            globeEl.current.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.5 }, 1200);
-                        }
+                        // Click handler for Visit
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            // Zoom in closer
+                            if (globeEl.current) {
+                                globeEl.current.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.5 }, 1200);
+                            }
 
-                        // Register visit
-                        visitCountry({ name: d.name, code: d.code, lat: d.lat, lng: d.lng });
+                            // Mark as visited locally for UI update
+                            setSelectedMarker({ ...d, visited: true });
 
-                        // Trigger AI Chat
-                        if (onCountrySelect) {
-                            onCountrySelect(d.name);
-                        }
-                    };
+                            // Register visit
+                            visitCountry({ name: d.name, code: d.code, lat: d.lat, lng: d.lng });
 
-                    el.appendChild(btn);
+                            // Trigger AI Chat
+                            if (onCountrySelect) {
+                                onCountrySelect(d.name);
+                            }
+                        };
+                        el.appendChild(btn);
+                    }
+
                     return el;
                 }}
             />
