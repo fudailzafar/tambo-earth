@@ -13,6 +13,8 @@ interface CountryContextType {
     isVisited: (countryName: string) => boolean;
     clearVisited: () => void;
     getLevelInfo: () => { name: string, nextThreshold: number | null, currentThreshold: number };
+    targetCountry: string | null;
+    flyToCountry: (countryName: string) => void;
 }
 
 const CountryContext = createContext<CountryContextType | undefined>(undefined);
@@ -53,8 +55,14 @@ export const PathfinderProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         return { name: "Wanderer", nextThreshold: 3, currentThreshold: 0 };
     };
 
+    const [targetCountry, setTargetCountry] = useState<string | null>(null);
+
+    const flyToCountry = (countryName: string) => {
+        setTargetCountry(countryName);
+    };
+
     return (
-        <CountryContext.Provider value={{ visitedCountries, visitCountry, isVisited, clearVisited, getLevelInfo }}>
+        <CountryContext.Provider value={{ visitedCountries, visitCountry, isVisited, clearVisited, getLevelInfo, targetCountry, flyToCountry }}>
             {children}
         </CountryContext.Provider>
     );

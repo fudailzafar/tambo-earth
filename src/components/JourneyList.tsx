@@ -13,7 +13,10 @@ interface JourneyListProps {
     details?: string[];
 }
 
+import { usePathfinder } from '../context/CountryContext';
+
 export const JourneyList = ({ title, destinations = [], description, details = [] }: JourneyListProps) => {
+    const { flyToCountry } = usePathfinder();
     const displayTitle = title || "Journey";
     // Ensure destinations is an array
     const destinationsList = Array.isArray(destinations) ? destinations : [];
@@ -34,7 +37,11 @@ export const JourneyList = ({ title, destinations = [], description, details = [
             {/* Destinations List */}
             <div className="flex flex-col gap-2">
                 {destinationsList.map((dest, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div
+                        key={index}
+                        onClick={() => dest?.country && flyToCountry(dest.country)}
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors active:scale-95 duration-200"
+                    >
                         <div className="p-2 bg-white rounded-lg shadow-sm text-gray-700">
                             <Globe className="w-5 h-5" />
                         </div>

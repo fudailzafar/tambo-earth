@@ -23,7 +23,8 @@ interface CountryFeature {
 
 export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countryName: string) => void }> = ({ className = "", onCountrySelect }) => {
     const globeEl = useRef<GlobeMethods | undefined>(undefined);
-    const { isVisited, visitCountry } = usePathfinder();
+    // Listen for fly requests from context
+    const { isVisited, visitCountry, targetCountry } = usePathfinder();
     const [countries, setCountries] = useState({ features: [] });
     const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
     const [selectedMarker, setSelectedMarker] = useState<{ lat: number, lng: number, code: string, name: string } | null>(null);
@@ -34,6 +35,21 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
             .then(res => res.json())
             .then(setCountries);
     }, []);
+
+    useEffect(() => {
+        if (targetCountry && countries.features.length > 0) {
+            const country = countries.features.find((f: any) => {
+                const props = f.properties as CountryProperties;
+                const name = props.ADMIN || props.NAME || props.name;
+                return name?.toLowerCase() === targetCountry.toLowerCase();
+            });
+
+            if (country) {
+                // Determine centroid and fly
+                handlePolygonClick(country as CountryFeature);
+            }
+        }
+    }, [targetCountry, countries]);
 
     useEffect(() => {
         if (globeEl.current) {
