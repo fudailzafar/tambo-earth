@@ -1,10 +1,10 @@
 import { z } from 'zod';
 export const LocationCard = ({ name, description, imageUrl, flag, points }: {
     name: string,
-    description: string,
-    imageUrl?: string,
-    flag?: string,
-    points?: string
+    description?: string | null,
+    imageUrl?: string | null,
+    flag?: string | null,
+    points?: string | null
 }) => {
     console.log("LocationCard rendering:", name);
     return (
@@ -26,7 +26,7 @@ export const LocationCard = ({ name, description, imageUrl, flag, points }: {
 
             {imageUrl && <img src={imageUrl} alt={name} className="w-full h-32 object-cover rounded-lg mb-3" />}
 
-            <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
+            {description && <p className="text-sm text-gray-600 leading-relaxed">{description}</p>}
 
             {/* Action buttons placeholder */}
             <div className="flex gap-4 mt-3 text-gray-400">
@@ -40,8 +40,8 @@ export const LocationCard = ({ name, description, imageUrl, flag, points }: {
 
 export const LocationCardSchema = z.object({
     name: z.string().describe("Name of the country or location"),
-    description: z.string().optional().describe("A brief, engaging description of the country."),
-    flag: z.string().optional().describe("The emoji flag of the country"),
-    points: z.string().optional().describe("Gamified points, e.g. '+1 point'"),
-    imageUrl: z.string().optional().describe("Image URL"),
+    description: z.string().nullish().describe("A brief, engaging description of the country."),
+    flag: z.string().nullish().describe("The emoji flag of the country"),
+    points: z.string().nullish().describe("Gamified points, e.g. '+1 point'"),
+    imageUrl: z.string().nullish().describe("Image URL"),
 });
