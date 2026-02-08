@@ -68,10 +68,13 @@ export const JourneyList = ({ title, destinations = [], description, details = [
     );
 };
 
-// Using z.any() for robustness as per previous experience with LocationCard
+// Using specific types for better LLM adherence
 export const JourneyListSchema = z.object({
-    title: z.any().describe("Title of the journey, e.g. 'Culinary Journey'"),
-    destinations: z.any().describe("Array of objects with 'country' and 'region' properties"),
-    description: z.any().describe("Introductory text describing the journey"),
-    details: z.any().describe("Array of strings, each describing a step of the journey or a destination in detail"),
+    title: z.string().nullish().describe("Title of the journey, e.g. 'Culinary Journey'"),
+    destinations: z.array(z.object({
+        country: z.string().describe("Country name"),
+        region: z.string().nullish().describe("Region or city within the country")
+    })).nullish().describe("Array of objects with 'country' and 'region' properties"),
+    description: z.string().nullish().describe("Introductory text describing the journey"),
+    details: z.array(z.string()).nullish().describe("Array of strings, each describing a step of the journey or a destination in detail"),
 });

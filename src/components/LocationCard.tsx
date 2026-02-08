@@ -59,9 +59,9 @@ export const LocationCard = ({ name, description, imageUrl, flag, points }: {
 };
 
 export const LocationCardSchema = z.object({
-    name: z.any().describe("Name of the country or location"),
-    description: z.any().describe("A brief, engaging description of the country."),
-    flag: z.any().describe("The emoji flag of the country"),
-    points: z.any().describe("Gamified points, e.g. '+1 point'"),
-    imageUrl: z.any().describe("Image URL"),
+    name: z.string().nullish().describe("Name of the country or location"),
+    description: z.string().nullish().describe("A brief, engaging description of the country."),
+    flag: z.string().nullish().describe("The emoji flag of the country"),
+    points: z.string().nullish().describe("Gamified points, e.g. '+1 point'"),
+    imageUrl: z.string().nullish().describe("Image URL"),
 });

@@ -119,19 +119,7 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
                 polygonCapColor={getPolygonColor as any}
                 polygonSideColor={() => 'rgba(0, 0, 0, 0)'}
                 polygonStrokeColor={() => '#111'}
-                polygonLabel={(obj: any) => {
-                    const d = obj.properties as CountryProperties;
-                    const name = d.ADMIN || d.NAME || d.name;
-                    const code = d.ISO_A2 || d.ISO_A3 || "UN";
-                    const flagUrl = `https://flagcdn.com/w40/${code?.toLowerCase()}.png`;
-
-                    return `
-                        <div style="background: transparent; color: white; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 24px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
-                            <img src="${flagUrl}" style="width: 24px; height: auto; border-radius: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.5);" onError="this.style.display='none'"/>
-                            <span style="font-weight: 500; font-family: system-ui;">${name}</span>
-                        </div>
-                    `;
-                }}
+                polygonLabel={() => ""}
                 onPolygonHover={(d: any) => {
                     const name = d ? (d.properties.ADMIN || d.properties.NAME || d.properties.name) : null;
                     setHoveredCountry(name || null);
@@ -188,7 +176,10 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
                     // Click handler for Visit
                     btn.onclick = (e) => {
                         e.stopPropagation();
-                        console.log("Visit clicked:", d.name);
+                        // Zoom in closer
+                        if (globeEl.current) {
+                            globeEl.current.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.5 }, 1200);
+                        }
 
                         // Register visit
                         visitCountry({ name: d.name, code: d.code, lat: d.lat, lng: d.lng });
@@ -196,11 +187,6 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
                         // Trigger AI Chat
                         if (onCountrySelect) {
                             onCountrySelect(d.name);
-                        }
-
-                        // Zoom in closer
-                        if (globeEl.current) {
-                            globeEl.current.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.6 }, 1000);
                         }
                     };
 

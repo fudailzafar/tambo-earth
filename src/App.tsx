@@ -46,7 +46,7 @@ const AppContent = () => {
   const handleCountrySelect = (countryName: string) => {
     console.log("Country selected:", countryName);
     if (sendThreadMessage) {
-      sendThreadMessage(`Tell me about ${countryName}. Use the LocationCard to show its flag and details. Also use the FunFact tool to show a fun fact or interesting trivia about it.`);
+      sendThreadMessage(`Tell me about ${countryName}. First, use the LocationCard to show what you know. Then, use the FunFact tool to share one unique or surprising fact.`);
     } else {
       console.error("sendThreadMessage is not available");
     }

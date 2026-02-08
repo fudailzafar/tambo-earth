@@ -35,8 +35,8 @@ export const FunFact = ({ fact, context }: FunFactProps) => {
     );
 };
 
-// Robust schema using z.any() as a fallback to ensure rendering, similar to other components
+// Robust schema using explicit types with .nullish()
 export const FunFactSchema = z.object({
-    fact: z.any().describe("The fun fact text content"),
-    context: z.any().describe("Optional context or category for the fact (e.g., 'History', 'Nature')"),
+    fact: z.string().nullish().describe("The fun fact text content"),
+    context: z.string().nullish().describe("Optional context or category for the fact (e.g., 'History', 'Nature')"),
 });
