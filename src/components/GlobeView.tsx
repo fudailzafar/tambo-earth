@@ -92,16 +92,13 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
             lat /= coords.length;
         }
 
-        console.log("Clicked:", name, code);
-        visitCountry({ name, code, lat, lng });
-        setSelectedMarker({ lat: lat, lng: lng, code: String(code), name: String(name) }); // Set marker
-
-        if (onCountrySelect) {
-            onCountrySelect(name);
-        }
+        console.log("Clicked (Selected):", name, code);
+        // Do NOT visit yet. Just select and zoom to intermediate level.
+        setSelectedMarker({ lat: lat, lng: lng, code: String(code), name: String(name) });
 
         if (globeEl.current) {
-            globeEl.current.pointOfView({ lat, lng, altitude: 0.6 }, 1000);
+            // Intermediate zoom for selection
+            globeEl.current.pointOfView({ lat, lng, altitude: 1.5 }, 1000);
         }
     };
 
@@ -144,13 +141,70 @@ export const GlobeView: React.FC<{ className?: string, onCountrySelect?: (countr
                 htmlElementsData={selectedMarker ? [selectedMarker] : []}
                 htmlElement={(d: any) => {
                     const el = document.createElement('div');
-                    el.innerHTML = `
-                        <div style="transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; pointer-events: none;">
-                            <img src="https://flagcdn.com/w80/${d.code.toLowerCase()}.png" style="width: 40px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 2px solid white;" />
-                            <div style="width: 2px; height: 20px; bg: white; background: white; margin-top: -2px;"></div>
-                            <div style="width: 8px; height: 8px; background: white; border-radius: 50%; margin-top: -1px;"></div>
-                        </div>
+                    el.style.transform = 'translate(-50%, -100%)';
+                    el.style.display = 'flex';
+                    el.style.flexDirection = 'column';
+                    el.style.alignItems = 'center';
+                    el.style.pointerEvents = 'auto'; // allow clicks
+                    el.style.cursor = 'default';
+
+                    // Label: Flag + Name
+                    const label = document.createElement('div');
+                    label.style.display = 'flex';
+                    label.style.alignItems = 'center';
+                    label.style.gap = '8px';
+                    label.style.padding = '8px 16px';
+                    label.style.background = 'rgba(20, 20, 20, 0.9)';
+                    label.style.borderRadius = '24px';
+                    label.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+                    label.style.marginBottom = '8px';
+                    label.style.border = '1px solid rgba(255,255,255,0.1)';
+                    label.style.backdropFilter = 'blur(4px)';
+
+                    label.innerHTML = `
+                        <img src="https://flagcdn.com/w40/${d.code.toLowerCase()}.png" style="width: 20px; height: 15px; object-fit: cover; border-radius: 2px;" />
+                        <span style="color: white; font-weight: 500; font-family: system-ui; white-space: nowrap;">${d.name}</span>
                     `;
+                    el.appendChild(label);
+
+                    // Visit Button
+                    const btn = document.createElement('button');
+                    btn.textContent = "Visit";
+                    btn.style.padding = '8px 20px';
+                    btn.style.background = 'white';
+                    btn.style.color = 'black';
+                    btn.style.borderRadius = '20px';
+                    btn.style.border = 'none';
+                    btn.style.fontWeight = '600';
+                    btn.style.fontSize = '14px';
+                    btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+                    btn.style.cursor = 'pointer';
+                    btn.style.transition = 'transform 0.1s';
+
+                    // Simple hover effect
+                    btn.onmouseenter = () => btn.style.transform = 'scale(1.05)';
+                    btn.onmouseleave = () => btn.style.transform = 'scale(1.0)';
+
+                    // Click handler for Visit
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        console.log("Visit clicked:", d.name);
+
+                        // Register visit
+                        visitCountry({ name: d.name, code: d.code, lat: d.lat, lng: d.lng });
+
+                        // Trigger AI Chat
+                        if (onCountrySelect) {
+                            onCountrySelect(d.name);
+                        }
+
+                        // Zoom in closer
+                        if (globeEl.current) {
+                            globeEl.current.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.6 }, 1000);
+                        }
+                    };
+
+                    el.appendChild(btn);
                     return el;
                 }}
             />

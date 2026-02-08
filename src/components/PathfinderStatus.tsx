@@ -28,7 +28,7 @@ export const PathfinderStatus: React.FC = () => {
         <>
             <div
                 onClick={() => setShowModal(true)}
-                className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 bg-white rounded-full shadow-2xl py-3 px-6 flex items-center gap-6 min-w-[340px] cursor-pointer hover:scale-105 transition-transform active:scale-95"
+                className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-white rounded-full shadow-2xl py-1 px-2 flex items-center gap-6 min-w-[340px] cursor-pointer hover:scale-105 transition-transform active:scale-95"
             >
                 {/* Level Indicator */}
                 <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-lg shrink-0 shadow-lg">

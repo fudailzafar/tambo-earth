@@ -8,12 +8,12 @@ interface FunFactProps {
 
 export const FunFact = ({ fact, context }: FunFactProps) => {
     return (
-        <div className="relative group max-w-sm">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl opacity-75 group-hover:opacity-100 transition duration-200 blur-[2px]"></div>
-            <div className="relative bg-white rounded-xl p-4 shadow-sm border border-yellow-100">
+        <div className="relative group w-full max-w-md">
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl opacity-50 group-hover:opacity-100 transition duration-200"></div>
+            <div className="relative bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-2 mb-2 text-yellow-600 font-bold uppercase tracking-wider text-xs">
                     <Sparkles className="w-4 h-4" />
-                    <span>Did Request Know?</span>
+                    <span>DID YOU KNOW?</span>
                 </div>
                 {context && (
                     <div className="text-xs text-gray-400 mb-2 font-medium">
