@@ -74,11 +74,11 @@ export const ChatSidebar: React.FC = () => {
     console.log("ChatSidebar rendered. Messages:", thread?.messages?.length);
 
     // Debug filtering
-    (thread?.messages || []).forEach((m, i) => {
-        const hasContent = Array.isArray(m.content) ? m.content.length > 0 : !!m.content;
-        const hasComponent = !!m.renderedComponent;
-        console.log(`Msg ${i} [${m.role}]: content=${m.content}, component=${hasComponent}`, m);
-    });
+    // (thread?.messages || []).forEach((m, i) => {
+    //     const hasContent = Array.isArray(m.content) ? m.content.length > 0 : !!m.content;
+    //     const hasComponent = !!m.renderedComponent;
+    //     console.log(`Msg ${i} [${m.role}]: content=${m.content}, component=${hasComponent}`, m);
+    // });
 
     // Filter out tool messages and messages with no visible content
     const MESSAGES = (thread?.messages || []).filter(m =>
