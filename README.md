@@ -2,8 +2,7 @@
 
 **Tambo Earth** is an interactive, AI-powered 3D globe application that allows users to explore the world through natural language conversations. It combines the visual immersion of 3D globe with the intelligence of a generative AI assistant, creating a seamless educational and exploratory experience.
 
-![Tambo Earth Demo]
-(https://github.com/fudailzafar/tambo-earth/blob/main/public/demo.gif)
+![Tambo Earth Demo](https://github.com/fudailzafar/tambo-earth/blob/main/public/demo.gif)
 
 ## ✨ About the Project
 
